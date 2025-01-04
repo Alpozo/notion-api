@@ -1,7 +1,14 @@
-const fetch = require("node-fetch");
-
 export default async function handler(req, res) {
   const { method } = req;
+
+  if (method === "OPTIONS") {
+    // Responder al preflight request con los encabezados CORS permitidos
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");
+    res.status(204).end(); // No content
+    return;
+  }
 
   if (method === "POST") {
     const { databaseId, query } = req.body;
@@ -60,7 +67,7 @@ export default async function handler(req, res) {
       res.status(500).json({ error: "Error interno del servidor" });
     }
   } else {
-    res.setHeader("Allow", [ "POST", "GET" ]);
+    res.setHeader("Allow", [ "POST", "GET", "OPTIONS" ]);
     res.status(405).end(`Método ${method} no permitido`);
   }
 }
